@@ -7,8 +7,8 @@ Docker image that runs a cron job which dumps a Postgres database, and uploads i
 Required environment variables
 ==============================
 
-* :code:`CRON_SCHEDULE`: The time schedule part of a crontab file (e.g: :code:`15 3 * * *` for every night 03:15)
 * :code:`DB_HOST`: Postgres hostname
+* :code:`DB_PORT`: Postgres username
 * :code:`DB_PASS`: Postgres password
 * :code:`DB_USER`: Postgres username
 * :code:`DB_NAME`: Name of database
