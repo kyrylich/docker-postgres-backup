@@ -85,7 +85,6 @@ def main():
     start_time = datetime.now()
     log("Dumping database")
     take_backup()
-    os.system('ls -la /data/backups ')
     log("Uploading to S3")
     upload_backup()
     log("Pruning local backup copies")
