@@ -2,6 +2,6 @@
 set -e
 
 # Execute backup
-python3 /backup/backup.py
+python3 -u /backup/backup.py
 
 exec "$@"

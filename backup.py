@@ -11,11 +11,7 @@ DB_NAME = os.environ["DB_NAME"]
 DB_PASS = os.environ["DB_PASS"]
 DB_USER = os.environ["DB_USER"]
 DB_HOST = os.environ["DB_HOST"]
-DB_PORT = os.environ["DB_PORT"]
-MAIL_TO = os.getenv("MAIL_TO")
-MAIL_FROM = os.getenv("MAIL_FROM")
-WEBHOOK = os.getenv("WEBHOOK")
-WEBHOOK_METHOD = os.getenv("WEBHOOK_METHOD") or "GET"
+DB_PORT = int(os.getenv("DB_PORT", 5432))
 KEEP_BACKUP_DAYS = int(os.getenv("KEEP_BACKUP_DAYS", 7))
 
 dt = datetime.now()
@@ -33,7 +29,7 @@ def cmd(command):
         sys.stderr.write("\n".join([
             "Command execution failed. Output:",
             "-"*80,
-            e.output,
+            str(e),
             "-"*80,
             ""
         ]))
@@ -48,7 +44,8 @@ def take_backup():
     """
     Trigger postgres-backup
     """
-    cmd('env PGPASSWORD=%s pg_dump -Fc --host "%s" --port "%s" -U %s %s > %s' % (DB_PASS, DB_HOST, DB_PORT, DB_USER, DB_NAME, backup_file))
+    cmd('env PGPASSWORD={0} pg_dump -Fc --host {1} --port {2} -U {3} {4} > {5}'
+        .format(DB_PASS, DB_HOST, DB_PORT, DB_USER, DB_NAME, backup_file))
 
 
 def upload_backup():
@@ -59,22 +56,7 @@ def upload_backup():
 
 
 def prune_local_backup_files():
-    cmd("find %s -type f -prune -mtime +%i -exec rm -f {} \;" % (BACKUP_DIR, KEEP_BACKUP_DAYS))
-
-
-def send_email(to_address, from_address, subject, body):
-    """
-    Super simple, doesn't do any escaping
-    """
-    cmd("""aws --region us-east-1 ses send-email --from %(from)s 
-            --destination '{"ToAddresses":["%(to)s"]}' 
-            --message '{"Subject":{"Data":"%(subject)s","Charset":"UTF-8"},
-            "Body":{"Text":{"Data":"%(body)s","Charset":"UTF-8"}}}'""" % {
-        "to": to_address,
-        "from": from_address,
-        "subject": subject,
-        "body": body,
-    })
+    cmd("find %s -type f -prune -mtime +%i -exec rm -f {} ;" % (BACKUP_DIR, KEEP_BACKUP_DAYS))
 
 
 def log(msg):
@@ -89,22 +71,13 @@ def main():
     upload_backup()
     log("Pruning local backup copies")
     prune_local_backup_files()
-    
-    if MAIL_TO and MAIL_FROM:
-        log("Sending mail to %s" % MAIL_TO)
-        send_email(
-            MAIL_TO,
-            MAIL_FROM,
-            "Backup complete: %s" % DB_NAME,
-            "Took %.2f seconds" % (datetime.now() - start_time).total_seconds(),
-        )
-    
-    if WEBHOOK:
-        log("Making HTTP %s request to webhook: %s" % (WEBHOOK_METHOD, WEBHOOK))
-        cmd("curl -X %s %s" % (WEBHOOK_METHOD, WEBHOOK))
-    
     log("Backup complete, took %.2f seconds" % (datetime.now() - start_time).total_seconds())
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+        sys.exit(0)  # Success
+    except Exception as e:
+        raise e
+

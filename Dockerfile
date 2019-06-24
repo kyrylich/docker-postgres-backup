@@ -14,6 +14,6 @@ VOLUME ["/data/backups"]
 
 ENV BACKUP_DIR /data/backups
 
-ADD . /backup
+COPY . /backup
 
 ENTRYPOINT ["/backup/entrypoint.sh"]
