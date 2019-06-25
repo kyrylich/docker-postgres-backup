@@ -1,12 +1,13 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
+from __future__ import print_function
 import os
 import subprocess
 import sys
 from datetime import datetime
 
 BACKUP_DIR = os.environ["BACKUP_DIR"]
-S3_PATH = os.environ["S3_PATH"]
+S3_PATH = os.environ["AWS_S3_PATH"]
 DB_NAME = os.environ["DB_NAME"]
 DB_PASS = os.environ["DB_PASS"]
 DB_USER = os.environ["DB_USER"]
@@ -77,4 +78,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+        sys.exit(0)  # Success
+    except Exception as e:
+        raise e

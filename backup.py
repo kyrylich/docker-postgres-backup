@@ -1,12 +1,13 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
+from __future__ import print_function
 import os
 import subprocess
 import sys
 from datetime import datetime
 
 BACKUP_DIR = os.environ["BACKUP_DIR"]
-S3_PATH = os.environ["S3_PATH"]
+AWS_S3_PATH = os.environ["AWS_S3_PATH"]
 DB_NAME = os.environ["DB_NAME"]
 DB_PASS = os.environ["DB_PASS"]
 DB_USER = os.environ["DB_USER"]
@@ -18,8 +19,8 @@ dt = datetime.now()
 file_name = DB_NAME + "_" + dt.strftime("%Y-%m-%d")
 backup_file = os.path.join(BACKUP_DIR, file_name)
 
-if not S3_PATH.endswith("/"):
-    S3_PATH = S3_PATH + "/"
+if not AWS_S3_PATH.endswith("/"):
+    AWS_S3_PATH = AWS_S3_PATH + "/"
 
 
 def cmd(command):
@@ -29,7 +30,7 @@ def cmd(command):
         sys.stderr.write("\n".join([
             "Command execution failed. Output:",
             "-"*80,
-            str(e),
+            e.output,
             "-"*80,
             ""
         ]))
@@ -52,11 +53,11 @@ def upload_backup():
     """
     Upload to Amazon S3 Bucket
     """
-    cmd("aws s3 cp %s %s" % (backup_file, S3_PATH))
+    cmd("aws s3 cp %s %s" % (backup_file, AWS_S3_PATH))
 
 
 def prune_local_backup_files():
-    cmd("find %s -type f -prune -mtime +%i -exec rm -f {} ;" % (BACKUP_DIR, KEEP_BACKUP_DAYS))
+    cmd("find %s -type f -prune -mtime +%i -exec rm -f {} \;" % (BACKUP_DIR, KEEP_BACKUP_DAYS))
 
 
 def log(msg):
