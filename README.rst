@@ -2,7 +2,7 @@
 Docker PostgreSQL Backup
 =========================
 
-Docker image that runs a cron job which dumps a Postgres database, and uploads it to an Amazon S3 bucket.
+Docker image that dumps a Postgres database, and uploads it to an Amazon S3 bucket.
 
 Required environment variables
 ==============================
