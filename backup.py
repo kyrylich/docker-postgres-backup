@@ -16,8 +16,8 @@ DB_PORT = int(os.getenv("DB_PORT", 5432))
 KEEP_BACKUP_DAYS = int(os.getenv("KEEP_BACKUP_DAYS", 7))
 
 dt = datetime.now()
-file_name = DB_NAME + "_" + dt.strftime("%Y-%m-%d")
-backup_file = os.path.join(BACKUP_DIR, file_name, '.sql')
+file_name = DB_NAME + "_" + dt.strftime("%Y-%m-%d") + '.sql'
+backup_file = os.path.join(BACKUP_DIR, file_name)
 
 if not AWS_S3_PATH.endswith("/"):
     AWS_S3_PATH = AWS_S3_PATH + "/"
