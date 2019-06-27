@@ -45,7 +45,7 @@ def take_backup():
     """
     Trigger postgres-backup
     """
-    cmd('env PGPASSWORD={0} pg_dump -Fc --host {1} --port {2} -U {3} {4} > {5}'
+    cmd('env PGPASSWORD={0} pg_dump --format plain -c --host {1} --port {2} -U {3} {4} > {5}'
         .format(DB_PASS, DB_HOST, DB_PORT, DB_USER, DB_NAME, backup_file))
 
 
