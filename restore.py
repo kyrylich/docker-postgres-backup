@@ -45,7 +45,7 @@ def restore_backup():
         sys.exit(1)
     
     # restore postgres-backup
-    cmd('env PGPASSWORD=%s pg_restore -Fc --host "%s" --port "%s" -U %s -d %s %s' % (
+    cmd('env PGPASSWORD=%s pg_restore --format plain -c --host "%s" --port "%s" -U %s -d %s %s' % (
         DB_PASS, 
         DB_HOST,
         DB_PORT,
